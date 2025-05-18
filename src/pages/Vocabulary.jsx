@@ -1,72 +1,167 @@
-const Vocabulary = ({ vocabulary }) => {
-  // Group vocabulary by category
-  const groupedVocabulary = vocabulary.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
-    acc[item.category].push(item);
-    return acc;
-  }, {});
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
-  // Function to get difficulty color
+const Vocabulary = ({ vocabulary }) => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [visibleCategories, setVisibleCategories] = useState([]);
+
+  // Check mobile status
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Group and sort vocabulary
+  const { groupedVocabulary, categoryDifficulty } = vocabulary.reduce(
+    (acc, item) => {
+      if (!acc.groupedVocabulary[item.category]) {
+        acc.groupedVocabulary[item.category] = [];
+      }
+
+      acc.groupedVocabulary[item.category].push(item);
+
+      const difficultyScore = { easy: 1, medium: 2, hard: 3 }[item.difficulty] || 0;
+      acc.categoryDifficulty[item.category] =
+        (acc.categoryDifficulty[item.category] || 0) + difficultyScore;
+
+      return acc;
+    },
+    { groupedVocabulary: {}, categoryDifficulty: {} }
+  );
+
+  // Sort categories by total difficulty (descending)
+  const categoryList = Object.keys(groupedVocabulary).sort(
+    (a, b) => categoryDifficulty[b] - categoryDifficulty[a]
+  );
+
+  // Sort words inside each category by difficulty (hard → easy)
+  categoryList.forEach((category) => {
+    groupedVocabulary[category].sort((a, b) => {
+      const difficultyOrder = { easy: 1, medium: 2, hard: 3 };
+      return difficultyOrder[b.difficulty] - difficultyOrder[a.difficulty];
+    });
+  });
+
+  // Reveal categories with IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleCategories((prev) =>
+              [...new Set([...prev, entry.target.dataset.category])]
+            );
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const sections = document.querySelectorAll('.category-section');
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [groupedVocabulary]);
+
   const getDifficultyColor = (level) => {
-    switch (level) {
-      case "easy":
-        return "bg-green-500";
-      case "medium":
-        return "bg-yellow-500";
-      case "hard":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
-    }
+    const colors = {
+      easy: 'bg-emerald-500',
+      medium: 'bg-amber-500',
+      hard: 'bg-rose-500',
+    };
+    return colors[level] || 'bg-gray-500';
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
-      {Object.entries(groupedVocabulary).map(([category, words]) => (
-        <div key={category} className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-blue-600 pb-2 mb-6">
-            {category}
-          </h2>
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 p-4 md:p-6">
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8 text-center"
+      >
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500 mb-2">
+          Quranic Vocabulary
+        </h1>
+        <p className="text-sm md:text-base text-gray-400">
+          Hardest words appear first in each category
+        </p>
+      </motion.header>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-            {words
-              .slice()
-              .sort((a, b) => {
-                const order = { easy: 1, medium: 2, hard: 3 };
-                return order[b.difficulty] - order[a.difficulty];
-              })
-              .map((word, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-200 relative"
-                >
-                  {/* Difficulty indicator */}
-                  {word.difficulty && (
-                    <div
-                      className={`absolute top-1 right-1 w-4 h-4 rounded-full ${getDifficultyColor(
-                        word.difficulty
-                      )} border-2 border-white`}
-                      title={`Difficulty: ${word.difficulty}`}
-                    >
-                      {" "}
-                    </div>
-                  )}
+      {/* Vocabulary Grid */}
+      <div className="space-y-10 md:space-y-12">
+        {categoryList.map((category) => (
+          <section
+            key={category}
+            data-category={category}
+            className="category-section"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{
+                opacity: visibleCategories.includes(category) ? 1 : 0,
+                y: visibleCategories.includes(category) ? 0 : 20,
+              }}
+              transition={{ duration: 0.5 }}
+              className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-gray-700"
+            >
+              <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 flex items-center">
+                <span className="bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+                  {category}
+                </span>
+                <span className="ml-3 text-xs bg-gray-700 px-2 py-1 rounded-full">
+                  {groupedVocabulary[category].length} words
+                </span>
+              </h2>
 
-                  <div className="p-4">
-                    <div className="text-center text-2xl font-quran mb-3 text-blue-800 ">
-                      {word.arabic}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+                {groupedVocabulary[category].map((word, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`relative rounded-lg overflow-hidden border-l-4 ${
+                      word.difficulty === 'hard'
+                        ? 'border-rose-500'
+                        : word.difficulty === 'medium'
+                        ? 'border-amber-500'
+                        : 'border-emerald-500'
+                    }`}
+                  >
+                    <div className="relative z-10 p-3 h-full flex flex-col items-center justify-center bg-gray-800/80">
+                      {/* Difficulty indicator */}
+                      <div
+                        className={`absolute top-2 right-2 w-3 h-3 rounded-full ${getDifficultyColor(
+                          word.difficulty
+                        )}`}
+                      ></div>
+
+                      {/* Arabic */}
+                      <div className="text-xl md:text-2xl font-quran text-indigo-300 mb-2">
+                        {word.arabic}
+                      </div>
+
+                      {/* Bengali translation */}
+                      <div className="text-center">
+                        <div className="text-sm md:text-base text-gray-300 font-medium font-liador">
+                          {word.bengali}
+                        </div>
+                        {word.pronunciation && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            [{word.pronunciation}]
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-center text-gray-700  font-liador font-semibold ">
-                      {word.bengali}
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      ))}
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </section>
+        ))}
+      </div>
     </div>
   );
 };
