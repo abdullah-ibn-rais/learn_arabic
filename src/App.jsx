@@ -1,11 +1,10 @@
 import Vocabulary from "./pages/Vocabulary"
 
-
 function App() {
   const vocabularyData = [
 
 
-    { arabic:' رَسُوْلٌ ', bengali: ' রাসুল ', category: ' islamic ', difficulty: 'easy' },
+{ arabic:' رَسُوْلٌ ', bengali: ' রাসুল ', category: ' islamic ', difficulty: 'easy' },
 { arabic:' خَلِيْفَةٌ ', bengali: ' খলীফা ', category: ' islamic ', difficulty: 'easy' },
 { arabic:' رَازِقٌ ', bengali: ' রিযিকদাতা ', category: ' islamic ', difficulty: 'easy' },
 { arabic:' بَائِسٌ ', bengali: ' নিঃস্ব ', category: ' human_adj ', difficulty: 'hard' },
@@ -94,7 +93,7 @@ function App() {
 { arabic:' لَحْمٌ ', bengali: ' গোশত ', category: ' food_drink ', difficulty: 'easy' },
 { arabic:' مِدْفَعٌ ', bengali: ' কামান ', category: ' weapon ', difficulty: 'easy' },
 { arabic:' طَعَامٌ ', bengali: ' খাবার ', category: ' food_drink ', difficulty: 'easy' },
-{ arabic:' جَرِيدَةٌ ', bengali: ' পত্রিকা ', category: ' object ', difficulty: 'easy' },
+{ arabic:' جَرِيدَةٌ ', bengali: ' সংবাদপত্র ', category: ' object ', difficulty: 'easy' },
 { arabic:' شَجَرَةٌ ', bengali: ' গাছ ', category: ' plant ', difficulty: 'medium' },
 { arabic:' زَهْرَةٌ ', bengali: ' ফুল ', category: ' plant ', difficulty: 'easy' },
 { arabic:' غَابَةٌ ', bengali: ' বন ', category: ' nature ', difficulty: 'easy' },
@@ -228,7 +227,7 @@ function App() {
 { arabic:' سُلَّمٌ ', bengali: '  সিঁড়ি ', category: ' house_part ', difficulty: 'hard' },
 { arabic:' مَدِينَةٌ ', bengali: '  শহর ', category: ' place ', difficulty: 'easy' },
 { arabic:' مَطْبَخٌ ', bengali: '  রান্নাঘর ', category: ' house_part ', difficulty: 'hard' },
-{ arabic:' مِمْسَاحَةٌ ', bengali: '  পাপোশ ', category: ' object ', difficulty: 'hard' },
+{ arabic:' مِمْسَحَةٌ ', bengali: '  পাপোশ ', category: ' object ', difficulty: 'hard' },
 { arabic:' قَمِيصٌ ', bengali: '  জামা ', category: ' clothing ', difficulty: 'easy' },
 { arabic:' دَوَاةٌ ', bengali: ' দোয়াত ', category: ' object ', difficulty: 'hard' },
 { arabic:' ثَوْبٌ ', bengali: '  কাপড় ', category: ' clothing ', difficulty: 'medium' },
