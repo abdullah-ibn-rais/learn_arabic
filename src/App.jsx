@@ -1,11 +1,11 @@
 import Vocabulary from "./pages/Vocabulary"
-
+import { Analytics } from "@vercel/analytics/next"
 
 function App() {
   const vocabularyData = [
 
 
-    { arabic:' رَسُوْلٌ ', bengali: ' রাসুল ', category: ' islamic ', difficulty: 'easy' },
+{ arabic:' رَسُوْلٌ ', bengali: ' রাসুল ', category: ' islamic ', difficulty: 'easy' },
 { arabic:' خَلِيْفَةٌ ', bengali: ' খলীফা ', category: ' islamic ', difficulty: 'easy' },
 { arabic:' رَازِقٌ ', bengali: ' রিযিকদাতা ', category: ' islamic ', difficulty: 'easy' },
 { arabic:' بَائِسٌ ', bengali: ' নিঃস্ব ', category: ' human_adj ', difficulty: 'hard' },
